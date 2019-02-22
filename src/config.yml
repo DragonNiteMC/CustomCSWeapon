@@ -1,2 +1,7 @@
 molotov:
   - Molotov
+scope:
+  - AWM
+  - M14
+  - M24
+  - SVD

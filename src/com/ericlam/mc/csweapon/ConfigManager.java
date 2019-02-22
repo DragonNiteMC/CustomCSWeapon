@@ -13,6 +13,7 @@ public class ConfigManager {
     private File configFile;
     private static ConfigManager configManager;
     private static List<String> molotovs = new ArrayList<>();
+    private static List<String> scopes = new ArrayList<>();
 
     public static ConfigManager getInstance() {
         return configManager;
@@ -23,9 +24,14 @@ public class ConfigManager {
     }
 
     public ConfigManager(Plugin plugin){
+        configManager = this;
         configFile = new File(plugin.getDataFolder(),"config.yml");
         if (!configFile.exists()) plugin.saveResource("config.yml",true);
         config = YamlConfiguration.loadConfiguration(configFile);
+    }
+
+    public static List<String> getScopes() {
+        return scopes;
     }
 
     private ConfigManager(){
@@ -34,6 +40,7 @@ public class ConfigManager {
 
     public void loadConfig(){
         molotovs = config.getStringList("molotov");
+        scopes = config.getStringList("scope");
     }
 
     public void reloadConfig(){
