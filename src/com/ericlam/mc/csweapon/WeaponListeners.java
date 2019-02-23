@@ -6,6 +6,7 @@ import com.shampaggon.crackshot.events.WeaponExplodeEvent;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
 import com.shampaggon.crackshot.events.WeaponScopeEvent;
 import com.shampaggon.crackshot.events.WeaponShootEvent;
+import me.DeeCaaD.CrackShotPlus.Events.WeaponPreReloadEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -103,6 +104,11 @@ public class WeaponListeners implements Listener {
     }
 
     @EventHandler
+    public void onReload(WeaponPreReloadEvent e) {
+        if (originalOffhandItem.containsKey(e.getPlayer())) unscope(e.getPlayer(), true);
+    }
+
+    @EventHandler
     public void arrarcute(WeaponPreShootEvent e) {
         if (!ConfigManager.getScopes().contains(e.getWeaponTitle())) return;
         if (!scoping.containsKey(e.getPlayer())) return;
@@ -113,12 +119,10 @@ public class WeaponListeners implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
         if (player.getInventory() == null) return;
-        if (e.getSlotType() != InventoryType.SlotType.QUICKBAR) return;
+        if (e.getSlotType() == InventoryType.SlotType.OUTSIDE) return;
         if (!e.getClickedInventory().equals(player.getInventory())) return;
-        if (e.getSlot() != -106) return;
-        if (item == null || item.getType() == Material.AIR) return;
-        if (item.getType() == Material.IRON_NUGGET) e.setCancelled(true);
+        if (e.getSlot() != 40) return;
+        e.setCancelled(true);
     }
 }
