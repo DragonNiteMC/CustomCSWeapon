@@ -7,12 +7,16 @@ import com.shampaggon.crackshot.events.WeaponPreShootEvent;
 import com.shampaggon.crackshot.events.WeaponScopeEvent;
 import com.shampaggon.crackshot.events.WeaponShootEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -22,6 +26,7 @@ public class WeaponListeners implements Listener {
     private CSUtility csUtility;
     private CSDirector csDirector;
     private HashMap<Player, String> scoping = new HashMap<>();
+    private HashMap<Player, ItemStack> originalOffhandItem = new HashMap<>();
 
     public WeaponListeners() {
         csUtility = new CSUtility();
@@ -43,22 +48,30 @@ public class WeaponListeners implements Listener {
             if (weaponTitle == null) return;
             if (!ConfigManager.getScopes().contains(weaponTitle)) return;
             scoping.put(player, weaponTitle);
-            scope(weaponTitle, player);
+            scope(weaponTitle, player, true);
         } else {
-            unscope(player);
+            unscope(player, true);
         }
     }
 
     @EventHandler
     public void onPlayerSwitch(PlayerItemHeldEvent e) {
         Player player = e.getPlayer();
-        unscope(player);
+        unscope(player, true);
     }
 
-    private void unscope(Player player) {
+    private void unscope(Player player, boolean remove) {
         if (!scoping.containsKey(player)) return;
         String weaponTitle = scoping.get(player);
-        scoping.remove(player);
+        if (remove) scoping.remove(player);
+        HashMap<String, ItemStack> skinScope = ConfigManager.getScopeSkin();
+        if (player.getInventory().getItemInOffHand().isSimilar(skinScope.get(weaponTitle))) {
+            ItemStack stack;
+            if (originalOffhandItem.containsKey(player)) stack = originalOffhandItem.get(player);
+            else stack = new ItemStack(Material.AIR);
+            player.getInventory().setItemInOffHand(stack);
+            originalOffhandItem.remove(player);
+        }
         CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
         player.removePotionEffect(PotionEffectType.SPEED);
     }
@@ -69,19 +82,24 @@ public class WeaponListeners implements Listener {
         if (!ConfigManager.getScopes().contains(weaponTitle)) return;
         if (!csDirector.getString(weaponTitle + ".Firearm_Action.Type").equalsIgnoreCase("bolt")) return;
         Player player = e.getPlayer();
-        if (!scoping.containsKey(player)) return;
-        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
-        player.removePotionEffect(PotionEffectType.SPEED);
+        unscope(player, false);
         int openTime = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Open_Duration");
         int closeShootDelay = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Close_Shoot_Delay");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CustomCSWeapon.getPlugin(), () -> scope(e.getWeaponTitle(), e.getPlayer()), closeShootDelay + openTime);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CustomCSWeapon.getPlugin(), () -> scope(e.getWeaponTitle(), e.getPlayer(), false), closeShootDelay + openTime);
     }
 
-    private void scope(String weaponTitle, Player player) {
+    private void scope(String weaponTitle, Player player, boolean put) {
         if (!scoping.containsKey(player)) return;
         int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
         CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
+        if (!ConfigManager.getScopeSkin().containsKey(weaponTitle)) return;
+        PlayerInventory playerInventory = player.getInventory();
+        final ItemStack original_item = playerInventory.getItemInOffHand();
+        if (put && original_item != null && original_item.getType() != Material.AIR)
+            originalOffhandItem.put(player, original_item);
+        ItemStack stack = ConfigManager.getScopeSkin().get(weaponTitle);
+        playerInventory.setItemInOffHand(stack);
     }
 
     @EventHandler
@@ -90,5 +108,17 @@ public class WeaponListeners implements Listener {
         if (!scoping.containsKey(e.getPlayer())) return;
         double spread = csDirector.getDouble(e.getWeaponTitle() + ".Scope.Zoom_Bullet_Spread");
         e.setBulletSpread(spread);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Player player = (Player) e.getWhoClicked();
+        ItemStack item = e.getCurrentItem();
+        if (player.getInventory() == null) return;
+        if (e.getSlotType() != InventoryType.SlotType.QUICKBAR) return;
+        if (!e.getClickedInventory().equals(player.getInventory())) return;
+        if (e.getSlot() != -106) return;
+        if (item == null || item.getType() == Material.AIR) return;
+        if (item.getType() == Material.IRON_NUGGET) e.setCancelled(true);
     }
 }

@@ -1,11 +1,18 @@
 package com.ericlam.mc.csweapon;
 
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ConfigManager {
@@ -14,6 +21,12 @@ public class ConfigManager {
     private static ConfigManager configManager;
     private static List<String> molotovs = new ArrayList<>();
     private static List<String> scopes = new ArrayList<>();
+    private static HashMap<String, ItemStack> scopeSkin;
+
+
+    public static HashMap<String, ItemStack> getScopeSkin() {
+        return scopeSkin;
+    }
 
     public static ConfigManager getInstance() {
         return configManager;
@@ -41,6 +54,22 @@ public class ConfigManager {
     public void loadConfig(){
         molotovs = config.getStringList("molotov");
         scopes = config.getStringList("scope");
+        HashMap<String, ItemStack> scopeSkin = new HashMap<>();
+        ConfigurationSection section = config.getConfigurationSection("scope-skin");
+        for (String weaponTitle : section.getKeys(false)) {
+            String[] value = section.getString(weaponTitle).split(":");
+            String material = value[0];
+            ItemStack skinStack = new ItemStack(Material.valueOf(material));
+            if (value.length > 1) {
+                ItemMeta meta = skinStack.getItemMeta();
+                ((Damageable) meta).setDamage(Integer.parseInt(value[1]));
+                meta.setUnbreakable(true);
+                meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+                skinStack.setItemMeta(meta);
+            }
+            scopeSkin.put(weaponTitle, skinStack);
+        }
+        ConfigManager.scopeSkin = scopeSkin;
     }
 
     public void reloadConfig(){

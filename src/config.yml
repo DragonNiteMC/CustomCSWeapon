@@ -5,3 +5,8 @@ scope:
   - M14
   - M24
   - SVD
+scope-skin: #[material]:[damage]
+  AWM: IRON_NUGGET
+  M14: IRON_NUGGET
+  M24: IRON_NUGGET
+  SVD: IRON_NUGGET
