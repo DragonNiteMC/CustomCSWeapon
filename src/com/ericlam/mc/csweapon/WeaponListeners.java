@@ -5,12 +5,12 @@ import com.shampaggon.crackshot.CSUtility;
 import com.shampaggon.crackshot.events.WeaponExplodeEvent;
 import com.shampaggon.crackshot.events.WeaponPreShootEvent;
 import com.shampaggon.crackshot.events.WeaponScopeEvent;
+import com.shampaggon.crackshot.events.WeaponShootEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -43,42 +43,45 @@ public class WeaponListeners implements Listener {
             if (weaponTitle == null) return;
             if (!ConfigManager.getScopes().contains(weaponTitle)) return;
             scoping.put(player, weaponTitle);
-            int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
-            CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
-            //CSPapi.changeSkin(item,player,weaponTitle,"Scope");
+            scope(weaponTitle, player);
         } else {
-            if (!scoping.containsKey(player)) return;
-            String weaponTitle = scoping.get(player);
-            scoping.remove(player);
-            CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
-            player.removePotionEffect(PotionEffectType.SPEED);
-            //CSPapi.removeSkin(item,player,weaponTitle);
+            unscope(player);
         }
     }
 
     @EventHandler
-    public void blockNormalScope(WeaponScopeEvent e) {
-        if (!ConfigManager.getScopes().contains(e.getWeaponTitle())) return;
-        if (e.isZoomIn() && !scoping.containsKey(e.getPlayer())) {
-            e.setCancelled(true);
-            csDirector.plugin.getServer().getPluginManager().callEvent(new WeaponScopeEvent(e.getPlayer(), e.getWeaponTitle(), false));
-        } else if (!e.isZoomIn() && scoping.containsKey(e.getPlayer())) {
-            e.setCancelled(true);
-            csDirector.plugin.getServer().getPluginManager().callEvent(new WeaponScopeEvent(e.getPlayer(), e.getWeaponTitle(), true));
-        }
+    public void onPlayerSwitch(PlayerItemHeldEvent e) {
+        Player player = e.getPlayer();
+        unscope(player);
+    }
+
+    private void unscope(Player player) {
+        if (!scoping.containsKey(player)) return;
+        String weaponTitle = scoping.get(player);
+        scoping.remove(player);
+        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
+        player.removePotionEffect(PotionEffectType.SPEED);
     }
 
     @EventHandler
-    public void interact(PlayerInteractEvent e) {
-        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
-        String weaponTitle = csUtility.getWeaponTitle(item);
-        if (e.getAction() != Action.LEFT_CLICK_AIR && e.getAction() != Action.LEFT_CLICK_BLOCK) return;
-        if (scoping.containsKey(e.getPlayer())) return;
-        if (weaponTitle == null) return;
+    public void onScopeShoot(WeaponShootEvent e) {
+        String weaponTitle = e.getWeaponTitle();
         if (!ConfigManager.getScopes().contains(weaponTitle)) return;
-        e.setUseItemInHand(Event.Result.DENY);
-        e.setUseInteractedBlock(Event.Result.DENY);
+        if (!csDirector.getString(weaponTitle + ".Firearm_Action.Type").equalsIgnoreCase("bolt")) return;
+        Player player = e.getPlayer();
+        if (!scoping.containsKey(player)) return;
+        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
+        player.removePotionEffect(PotionEffectType.SPEED);
+        int openTime = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Open_Duration");
+        int closeShootDelay = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Close_Shoot_Delay");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CustomCSWeapon.getPlugin(), () -> scope(e.getWeaponTitle(), e.getPlayer()), closeShootDelay + openTime);
+    }
+
+    private void scope(String weaponTitle, Player player) {
+        if (!scoping.containsKey(player)) return;
+        int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
+        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
     }
 
     @EventHandler
