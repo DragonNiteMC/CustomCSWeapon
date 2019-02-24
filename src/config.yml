@@ -10,3 +10,9 @@ scope-skin: #[material]:[damage]
   M14: IRON_NUGGET
   M24: IRON_NUGGET
   SVD: IRON_NUGGET
+flashbangs:
+  - Flashbang
+flash-radius: 30
+flash-bypass-blacklist:
+  - GLASS
+  - GLASS_PANE

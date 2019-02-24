@@ -20,6 +20,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CommandExecu
         plugin = this;
         new ConfigManager(this).loadConfig();
         getServer().getPluginManager().registerEvents(new WeaponListeners(), this);
+        getServer().getPluginManager().registerEvents(new FlashBangListeners(), this);
     }
 
     @Override

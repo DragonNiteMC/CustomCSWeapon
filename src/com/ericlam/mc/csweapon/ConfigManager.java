@@ -18,14 +18,25 @@ import java.util.List;
 public class ConfigManager {
     private FileConfiguration config;
     private File configFile;
+    public static int flash_radius;
     private static ConfigManager configManager;
     private static List<String> molotovs = new ArrayList<>();
     private static List<String> scopes = new ArrayList<>();
+    private static List<String> flashbangs = new ArrayList<>();
     private static HashMap<String, ItemStack> scopeSkin;
+    private static List<String> flashBypass = new ArrayList<>();
 
+
+    public static List<String> getFlashBypass() {
+        return flashBypass;
+    }
 
     public static HashMap<String, ItemStack> getScopeSkin() {
         return scopeSkin;
+    }
+
+    public static List<String> getFlashbangs() {
+        return flashbangs;
     }
 
     public static ConfigManager getInstance() {
@@ -54,6 +65,9 @@ public class ConfigManager {
     public void loadConfig(){
         molotovs = config.getStringList("molotov");
         scopes = config.getStringList("scope");
+        flashbangs = config.getStringList("flashbangs");
+        flash_radius = config.getInt("flash-radius");
+        flashBypass = config.getStringList("flash-bypass-blacklist");
         HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("scope-skin");
         for (String weaponTitle : section.getKeys(false)) {
