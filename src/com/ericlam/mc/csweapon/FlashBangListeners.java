@@ -22,6 +22,7 @@ public class FlashBangListeners implements Listener {
         if (!ConfigManager.getFlashbangs().contains(e.getWeaponTitle())) return;
         Location flash = e.getLocation();
         Collection<Player> nearbyPlayers = flash.getNearbyPlayers(ConfigManager.flash_radius);
+        playerloop:
         for (Player player : nearbyPlayers) {
             Location loc = player.getEyeLocation();
             Vector vec = new Vector(loc.getX() - flash.getX(), loc.getY() - flash.getY(), loc.getZ() - flash.getZ());
@@ -29,7 +30,8 @@ public class FlashBangListeners implements Listener {
             BlockIterator iterator = new BlockIterator(player.getWorld(), flash.toVector(), vec, 0, (int) flash.distance(loc));
             while (iterator.hasNext()) {
                 Material current = iterator.next().getType();
-                if (current != Material.AIR && !ConfigManager.getFlashBypass().contains(current.toString())) return;
+                if (current != Material.AIR && !ConfigManager.getFlashBypass().contains(current.toString()))
+                    continue playerloop;
             }
             if (dot < 0) {
                 if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE) continue;
