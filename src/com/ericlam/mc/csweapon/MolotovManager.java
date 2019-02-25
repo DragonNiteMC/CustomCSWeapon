@@ -9,7 +9,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 public class MolotovManager {
     private static MolotovManager molotovManager;
@@ -71,7 +74,7 @@ public class MolotovManager {
             }
             fires.clear();
 
-        },20 * 20L);
+        }, ConfigManager.molo_duration * 20L);
         Bukkit.getScheduler().scheduleSyncDelayedTask(CustomCSWeapon.getPlugin(),()->{
             if (lavas.size() == 0) return;
             for (Location location : lavas.keySet()) {
@@ -80,7 +83,7 @@ public class MolotovManager {
                 lavaBlockCacahes.remove(location);
             }
             lavas.clear();
-        },25 * 20L);
+        }, (ConfigManager.molo_duration + ConfigManager.lava_duration) * 20L);
     }
 
     private void restore(HashMap<Location, BlockData> lavas, Location location, Block lavaBlock) {

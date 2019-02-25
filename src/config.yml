@@ -1,3 +1,5 @@
+molotov-duration: 20
+lava-block-duration: 15
 molotov:
   - Molotov
 scope:

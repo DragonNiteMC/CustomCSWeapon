@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +39,17 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CommandExecu
             }
             ConfigManager.getInstance().reloadConfig();
             sender.sendMessage(ChatColor.GREEN + "Reload completed.");
+        }
+        if (command.getName().equalsIgnoreCase("csw-scope")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("not player !");
+                return false;
+            }
+            Player player = (Player) sender;
+            boolean contain = WeaponListeners.leftscopes.contains(player.getUniqueId());
+            if (contain) WeaponListeners.leftscopes.remove(player.getUniqueId());
+            else WeaponListeners.leftscopes.add(player.getUniqueId());
+            player.sendMessage(!contain ? ChatColor.GREEN + "已切為左鍵開鏡。" : ChatColor.RED + "已切為蹲下開鏡。");
         }
         return true;
     }

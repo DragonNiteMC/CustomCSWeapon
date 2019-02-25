@@ -12,8 +12,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,12 +24,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class WeaponListeners implements Listener {
     private CSUtility csUtility;
     private CSDirector csDirector;
     private HashMap<Player, String> scoping = new HashMap<>();
     private HashMap<Player, ItemStack> originalOffhandItem = new HashMap<>();
+    public static HashSet<UUID> leftscopes = new HashSet<>(); //later change permission
 
     public WeaponListeners() {
         csUtility = new CSUtility();
@@ -40,10 +45,30 @@ public class WeaponListeners implements Listener {
         MolotovManager.getInstance().spawnFires(e.getLocation().getBlock());
     }
 
+
+    @EventHandler
+    public void onPlayerLeftScope(PlayerInteractEvent e) {
+        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+        Player player = e.getPlayer();
+        if (e.getAction() != Action.LEFT_CLICK_AIR) return;
+        if (!leftscopes.contains(player.getUniqueId())) return;
+        if (!scoping.containsKey(player)) {
+            String weaponTitle = csUtility.getWeaponTitle(item);
+            if (weaponTitle == null) return;
+            if (!ConfigManager.getScopes().contains(weaponTitle)) return;
+            scoping.put(player, weaponTitle);
+            scope(weaponTitle, player, true);
+        } else {
+            unscope(player, true);
+        }
+
+    }
+
     @EventHandler
     public void onPlayerSneak(PlayerToggleSneakEvent e) {
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
         Player player = e.getPlayer();
+        if (leftscopes.contains(player.getUniqueId())) return;
         if (e.isSneaking()) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;

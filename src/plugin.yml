@@ -7,3 +7,5 @@ depend: [CrackShotPlus, CrackShot, HyperNiteMC-Core]
 commands:
   csw-reload:
     description: reload command
+  csw-scope:
+    description: left click scope or sneak scope

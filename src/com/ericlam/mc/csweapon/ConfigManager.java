@@ -18,7 +18,7 @@ import java.util.List;
 public class ConfigManager {
     private FileConfiguration config;
     private File configFile;
-    public static int flash_radius;
+    public static int flash_radius, molo_duration, lava_duration;
     private static ConfigManager configManager;
     private static List<String> molotovs = new ArrayList<>();
     private static List<String> scopes = new ArrayList<>();
@@ -63,6 +63,8 @@ public class ConfigManager {
     }
 
     public void loadConfig(){
+        molo_duration = config.getInt("molotov-duration");
+        lava_duration = config.getInt("lava-block-duration");
         molotovs = config.getStringList("molotov");
         scopes = config.getStringList("scope");
         flashbangs = config.getStringList("flashbangs");
