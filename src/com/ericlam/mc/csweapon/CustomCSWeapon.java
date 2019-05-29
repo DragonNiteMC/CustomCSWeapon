@@ -1,5 +1,6 @@
 package com.ericlam.mc.csweapon;
 
+import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,7 +35,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CommandExecu
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equals("csw-reload")) {
             if (!sender.hasPermission("hypernite.admin")) {
-                sender.sendMessage(com.hypernite.config.ConfigManager.getInstance().getNoPerm());
+                sender.sendMessage(HyperNiteMC.getAPI().getCoreConfig().getPrefix() + HyperNiteMC.getAPI().getCoreConfig().getNoPerm());
                 return false;
             }
             ConfigManager.getInstance().reloadConfig();

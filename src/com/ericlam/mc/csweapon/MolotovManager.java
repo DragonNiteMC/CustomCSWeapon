@@ -1,6 +1,7 @@
 package com.ericlam.mc.csweapon;
 
-import com.ericlam.utils.Utils;
+import com.hypernite.mc.hnmc.core.utils.Tools;
+import com.hypernite.mc.hnmc.core.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,7 +31,7 @@ public class MolotovManager {
             if (i >= circle.size()) return result;
             Location loc;
             do{
-               loc =  circle.get(Utils.randomWithRange(0,circle.size()-1));
+                loc = circle.get(Tools.randomWithRange(0, circle.size() - 1));
             }while(result.contains(loc));
             result.add(loc);
         }
@@ -45,8 +46,8 @@ public class MolotovManager {
         double z = center.getZ();
         HashSet<Location> fires = new HashSet<>();
         HashMap<Location, BlockData> lavas = new HashMap<>();
-        int size = Utils.randomWithRange(100,200);
-        List<Location> circle = Utils.circle(center,Utils.randomWithRange(5,10)+1,3,false,false,0);
+        int size = Tools.randomWithRange(100, 200);
+        List<Location> circle = Utils.circle(center, Tools.randomWithRange(5, 10) + 1, 3, false, false, 0);
        for (Location loc : getRandomSpread(circle,size)){
            Location under;
            if (loc.getBlock().getType() == Material.FIRE) continue;
