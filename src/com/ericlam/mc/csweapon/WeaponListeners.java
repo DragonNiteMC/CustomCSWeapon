@@ -28,13 +28,15 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class WeaponListeners implements Listener {
-    private CSUtility csUtility;
-    private CSDirector csDirector;
+    public static HashSet<UUID> leftScopes = new HashSet<>(); //later change permission
+    private final CSUtility csUtility;
+    private final CSDirector csDirector;
     private HashMap<Player, String> scoping = new HashMap<>();
     private HashMap<Player, ItemStack> originalOffhandItem = new HashMap<>();
-    public static HashSet<UUID> leftscopes = new HashSet<>(); //later change permission
+    private final CustomCSWeapon csWeapon;
 
-    public WeaponListeners() {
+    public WeaponListeners(CustomCSWeapon csWeapon) {
+        this.csWeapon = csWeapon;
         csUtility = new CSUtility();
         csDirector = csUtility.getHandle();
     }
@@ -42,7 +44,7 @@ public class WeaponListeners implements Listener {
     @EventHandler
     public void onMolotovExplode(WeaponExplodeEvent e) {
         if (!ConfigManager.getMolotovs().contains(e.getWeaponTitle())) return;
-        MolotovManager.getInstance().spawnFires(e.getLocation().getBlock());
+        csWeapon.getMolotovManager().spawnFires(e.getLocation().getBlock());
     }
 
 
@@ -51,7 +53,7 @@ public class WeaponListeners implements Listener {
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
         Player player = e.getPlayer();
         if (e.getAction() != Action.LEFT_CLICK_AIR) return;
-        if (!leftscopes.contains(player.getUniqueId())) return;
+        if (!leftScopes.contains(player.getUniqueId())) return;
         if (!scoping.containsKey(player)) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
@@ -68,7 +70,7 @@ public class WeaponListeners implements Listener {
     public void onPlayerSneak(PlayerToggleSneakEvent e) {
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
         Player player = e.getPlayer();
-        if (leftscopes.contains(player.getUniqueId())) return;
+        if (leftScopes.contains(player.getUniqueId())) return;
         if (e.isSneaking()) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
@@ -98,7 +100,7 @@ public class WeaponListeners implements Listener {
             player.getInventory().setItemInOffHand(stack);
             originalOffhandItem.remove(player);
         }
-        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
+        csWeapon.getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, false));
         player.removePotionEffect(PotionEffectType.SPEED);
     }
 
@@ -111,13 +113,13 @@ public class WeaponListeners implements Listener {
         unscope(player, false);
         int openTime = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Open_Duration");
         int closeShootDelay = csDirector.getInt(e.getWeaponTitle() + ".Firearm_Action.Close_Shoot_Delay");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CustomCSWeapon.getPlugin(), () -> scope(e.getWeaponTitle(), e.getPlayer(), false), closeShootDelay + openTime);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(csWeapon, () -> scope(e.getWeaponTitle(), e.getPlayer(), false), closeShootDelay + openTime);
     }
 
     private void scope(String weaponTitle, Player player, boolean put) {
         if (!scoping.containsKey(player)) return;
         int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
-        CustomCSWeapon.getPlugin().getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
+        csWeapon.getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
         if (!ConfigManager.getScopeSkin().containsKey(weaponTitle)) return;
         PlayerInventory playerInventory = player.getInventory();
@@ -144,7 +146,7 @@ public class WeaponListeners implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        if (player.getInventory() == null) return;
+        if (e.getClickedInventory() == null) return;
         if (e.getSlotType() == InventoryType.SlotType.OUTSIDE) return;
         if (!e.getClickedInventory().equals(player.getInventory())) return;
         if (e.getSlot() != 40) return;

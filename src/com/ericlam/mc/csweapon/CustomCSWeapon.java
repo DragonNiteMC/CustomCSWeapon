@@ -1,38 +1,40 @@
 package com.ericlam.mc.csweapon;
 
+import com.ericlam.mc.csweapon.api.CCSWeaponAPI;
+import com.ericlam.mc.csweapon.api.MolotovManager;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class CustomCSWeapon extends JavaPlugin implements Listener, CommandExecutor {
-    private static Plugin plugin;
+import javax.annotation.Nonnull;
 
-    static Plugin getPlugin() {
-        return plugin;
+public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI {
+    private static CCSWeaponAPI api;
+    private final MolotovManager molotovManager = new MolotovManagerImpl();
+
+    public static CCSWeaponAPI getApi() {
+        return api;
     }
 
     @Override
     public void onEnable() {
-        plugin = this;
+        api = this;
         new ConfigManager(this).loadConfig();
-        getServer().getPluginManager().registerEvents(new WeaponListeners(), this);
+        getServer().getPluginManager().registerEvents(new WeaponListeners(this), this);
         getServer().getPluginManager().registerEvents(new FlashBangListeners(), this);
     }
 
     @Override
     public void onDisable() {
-        MolotovManager.getInstance().resetFires();
-        MolotovManager.getInstance().resetLavaBlocks();
+        molotovManager.resetFires();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@Nonnull CommandSender sender, Command command, @Nonnull String label, @Nonnull String[] args) {
         if (command.getName().equals("csw-reload")) {
             if (!sender.hasPermission("hypernite.admin")) {
                 sender.sendMessage(HyperNiteMC.getAPI().getCoreConfig().getPrefix() + HyperNiteMC.getAPI().getCoreConfig().getNoPerm());
@@ -47,11 +49,16 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CommandExecu
                 return false;
             }
             Player player = (Player) sender;
-            boolean contain = WeaponListeners.leftscopes.contains(player.getUniqueId());
-            if (contain) WeaponListeners.leftscopes.remove(player.getUniqueId());
-            else WeaponListeners.leftscopes.add(player.getUniqueId());
+            boolean contain = WeaponListeners.leftScopes.contains(player.getUniqueId());
+            if (contain) WeaponListeners.leftScopes.remove(player.getUniqueId());
+            else WeaponListeners.leftScopes.add(player.getUniqueId());
             player.sendMessage(!contain ? ChatColor.GREEN + "已切為左鍵開鏡。" : ChatColor.RED + "已切為蹲下開鏡。");
         }
         return true;
+    }
+
+    @Override
+    public MolotovManager getMolotovManager() {
+        return molotovManager;
     }
 }
