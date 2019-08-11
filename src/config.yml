@@ -17,3 +17,7 @@ flash-radius: 30
 flash-bypass-blacklist:
   - GLASS
   - GLASS_PANE
+headshot:
+  custom-sound: false
+  helmet-sound: "ENTITY_ZOMBIE_DEATH"
+  no-helmet-sound: "ENTITY_IRON_GOLEM_ATTACK"

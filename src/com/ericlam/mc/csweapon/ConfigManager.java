@@ -18,8 +18,10 @@ import java.util.List;
 public class ConfigManager {
     private FileConfiguration config;
     private File configFile;
-    public static int flash_radius, molo_duration;
+    static int flash_radius, molo_duration;
     private static ConfigManager configManager;
+    static String helmetSound, noHelmetSound;
+    static boolean customSound;
     private static List<String> molotovs = new ArrayList<>();
     private static List<String> scopes = new ArrayList<>();
     private static List<String> flashbangs = new ArrayList<>();
@@ -69,6 +71,9 @@ public class ConfigManager {
         flashbangs = config.getStringList("flashbangs");
         flash_radius = config.getInt("flash-radius");
         flashBypass = config.getStringList("flash-bypass-blacklist");
+        helmetSound = config.getString("headshot.helmet-sound");
+        noHelmetSound = config.getString("headshot.no-helmet-sound");
+        customSound = config.getBoolean("headshot.custom-sound");
         HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("scope-skin");
         for (String weaponTitle : section.getKeys(false)) {

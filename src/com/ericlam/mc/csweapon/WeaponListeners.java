@@ -2,14 +2,13 @@ package com.ericlam.mc.csweapon;
 
 import com.shampaggon.crackshot.CSDirector;
 import com.shampaggon.crackshot.CSUtility;
-import com.shampaggon.crackshot.events.WeaponExplodeEvent;
-import com.shampaggon.crackshot.events.WeaponPreShootEvent;
-import com.shampaggon.crackshot.events.WeaponScopeEvent;
-import com.shampaggon.crackshot.events.WeaponShootEvent;
+import com.shampaggon.crackshot.events.*;
 import me.DeeCaaD.CrackShotPlus.Events.WeaponPreReloadEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -45,6 +44,23 @@ public class WeaponListeners implements Listener {
     public void onMolotovExplode(WeaponExplodeEvent e) {
         if (!ConfigManager.getMolotovs().contains(e.getWeaponTitle())) return;
         csWeapon.getMolotovManager().spawnFires(e.getLocation().getBlock());
+    }
+
+    @EventHandler
+    public void onGunDamage(WeaponDamageEntityEvent e) {
+        if (!(e.getDamager() instanceof Projectile)) return;
+        if (!(e.getVictim() instanceof Player)) return;
+        Player player = (Player) e.getVictim();
+        if (!e.isHeadshot()) return;
+        boolean helmet = player.getInventory().getHelmet() != null;
+        String sound = helmet ? ConfigManager.helmetSound : ConfigManager.noHelmetSound;
+        if (ConfigManager.customSound) {
+            player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 5, 1);
+        } else {
+            player.getWorld().playSound(player.getLocation(), sound, 5, 1);
+        }
+
+
     }
 
 
