@@ -54,10 +54,10 @@ public class WeaponListeners implements Listener {
         if (!e.isHeadshot()) return;
         boolean helmet = player.getInventory().getHelmet() != null;
         String sound = helmet ? ConfigManager.helmetSound : ConfigManager.noHelmetSound;
-        if (ConfigManager.customSound) {
-            player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 5, 1);
+        if (!ConfigManager.customSound) {
+            player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 3, 1);
         } else {
-            player.getWorld().playSound(player.getLocation(), sound, 5, 1);
+            player.getWorld().playSound(player.getLocation(), sound, 3, 1);
         }
 
 
