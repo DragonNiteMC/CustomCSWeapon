@@ -21,3 +21,8 @@ headshot:
   custom-sound: false
   helmet-sound: "ENTITY_ZOMBIE_DEATH"
   no-helmet-sound: "ENTITY_IRON_GOLEM_ATTACK"
+knockback:
+  disable: true
+  custom:
+    damage-percent: true
+    value: 0.00888

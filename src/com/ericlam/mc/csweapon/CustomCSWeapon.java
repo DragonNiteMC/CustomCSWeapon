@@ -26,7 +26,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
         api = this;
         new ConfigManager(this).loadConfig();
         getServer().getPluginManager().registerEvents(new WeaponListeners(this), this);
-        getServer().getPluginManager().registerEvents(new FlashBangListeners(), this);
+        getServer().getPluginManager().registerEvents(new MechanicListener(), this);
     }
 
     @Override

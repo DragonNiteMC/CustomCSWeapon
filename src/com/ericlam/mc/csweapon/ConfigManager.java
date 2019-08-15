@@ -21,7 +21,8 @@ public class ConfigManager {
     static int flash_radius, molo_duration;
     private static ConfigManager configManager;
     static String helmetSound, noHelmetSound;
-    static boolean customSound;
+    static boolean customSound, noKnockBack, useDamagePercent;
+    static double customKnockBack;
     private static List<String> molotovs = new ArrayList<>();
     private static List<String> scopes = new ArrayList<>();
     private static List<String> flashbangs = new ArrayList<>();
@@ -74,6 +75,9 @@ public class ConfigManager {
         helmetSound = config.getString("headshot.helmet-sound");
         noHelmetSound = config.getString("headshot.no-helmet-sound");
         customSound = config.getBoolean("headshot.custom-sound");
+        noKnockBack = config.getBoolean("knockback.disable");
+        useDamagePercent = config.getBoolean("knockback.damage-percent");
+        customKnockBack = config.getDouble("knockback.custom.value");
         HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("scope-skin");
         for (String weaponTitle : section.getKeys(false)) {

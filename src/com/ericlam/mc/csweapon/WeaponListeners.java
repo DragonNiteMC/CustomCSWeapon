@@ -59,8 +59,6 @@ public class WeaponListeners implements Listener {
         } else {
             player.getWorld().playSound(player.getLocation(), sound, 3, 1);
         }
-
-
     }
 
 
