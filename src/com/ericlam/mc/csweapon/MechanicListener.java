@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public class MechanicListener implements Listener, KnockBackManager {
-
-    private Set<OfflinePlayer> knockBackEnabled = new HashSet<>();
     private Set<OfflinePlayer> customKBDisabled = new HashSet<>();
 
     @EventHandler
@@ -72,7 +70,6 @@ public class MechanicListener implements Listener, KnockBackManager {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (!ConfigManager.noKnockBack) return;
-        if (knockBackEnabled.contains(e.getPlayer())) return;
         Optional.ofNullable(e.getPlayer().getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).ifPresent(attr -> {
 
             for (AttributeModifier attrMod : attr.getModifiers()) {
@@ -89,12 +86,6 @@ public class MechanicListener implements Listener, KnockBackManager {
     @Override
     public void createKnockBack(Entity damager, Entity victim, double value) {
         (new KnockBackRunnable(damager, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
-    }
-
-    @Override
-    public void setNormalKnockBack(Player player, boolean enable) {
-        if (enable) knockBackEnabled.add(player);
-        else knockBackEnabled.remove(player);
     }
 
     @Override

@@ -76,7 +76,7 @@ public class ConfigManager {
         noHelmetSound = config.getString("headshot.no-helmet-sound");
         customSound = config.getBoolean("headshot.custom-sound");
         noKnockBack = config.getBoolean("knockback.disable");
-        useDamagePercent = config.getBoolean("knockback.damage-percent");
+        useDamagePercent = config.getBoolean("knockback.custom.damage-percent");
         customKnockBack = config.getDouble("knockback.custom.value");
         HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("scope-skin");

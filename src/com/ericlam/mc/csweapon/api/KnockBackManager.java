@@ -7,7 +7,5 @@ public interface KnockBackManager {
 
     void createKnockBack(Entity damager, Entity victim, double value);
 
-    void setNormalKnockBack(Player player, boolean enable);
-
     void setCustomKnockBack(Player player, boolean enable);
 }
