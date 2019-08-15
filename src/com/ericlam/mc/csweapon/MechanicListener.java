@@ -1,12 +1,10 @@
 package com.ericlam.mc.csweapon;
 
 
+import com.ericlam.mc.csweapon.api.KnockBackManager;
 import com.shampaggon.crackshot.events.WeaponDamageEntityEvent;
 import com.shampaggon.crackshot.events.WeaponExplodeEvent;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
@@ -22,9 +20,14 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
-public class MechanicListener implements Listener {
+public class MechanicListener implements Listener, KnockBackManager {
+
+    private Set<OfflinePlayer> knockBackEnabled = new HashSet<>();
+    private Set<OfflinePlayer> customKBDisabled = new HashSet<>();
 
     @EventHandler
     public void onFlashbang(WeaponExplodeEvent e) {
@@ -59,14 +62,17 @@ public class MechanicListener implements Listener {
         Entity damager = e.getDamager();
         Entity damagee = e.getVictim();
         if (!(damagee instanceof Player)) return;
+        Player vPlayer = (Player) damagee;
+        if (customKBDisabled.contains(vPlayer)) return;
         if (!(damager instanceof Projectile)) return;
         final double kb = ConfigManager.useDamagePercent ? e.getDamage() * ConfigManager.customKnockBack : ConfigManager.customKnockBack;
-        (new KnockBackRunnable(damager, damagee, kb)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
+        this.createKnockBack(damager, damagee, kb);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         if (!ConfigManager.noKnockBack) return;
+        if (knockBackEnabled.contains(e.getPlayer())) return;
         Optional.ofNullable(e.getPlayer().getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).ifPresent(attr -> {
 
             for (AttributeModifier attrMod : attr.getModifiers()) {
@@ -78,5 +84,22 @@ public class MechanicListener implements Listener {
 
             attr.addModifier(new AttributeModifier("cs_kbr", 3.0D, AttributeModifier.Operation.ADD_NUMBER));
         });
+    }
+
+    @Override
+    public void createKnockBack(Entity damager, Entity victim, double value) {
+        (new KnockBackRunnable(damager, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
+    }
+
+    @Override
+    public void setNormalKnockBack(Player player, boolean enable) {
+        if (enable) knockBackEnabled.add(player);
+        else knockBackEnabled.remove(player);
+    }
+
+    @Override
+    public void setCustomKnockBack(Player player, boolean enable) {
+        if (enable) customKBDisabled.remove(player);
+        else customKBDisabled.add(player);
     }
 }

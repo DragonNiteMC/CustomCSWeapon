@@ -1,6 +1,7 @@
 package com.ericlam.mc.csweapon;
 
 import com.ericlam.mc.csweapon.api.CCSWeaponAPI;
+import com.ericlam.mc.csweapon.api.KnockBackManager;
 import com.ericlam.mc.csweapon.api.MolotovManager;
 import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import javax.annotation.Nonnull;
 public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI {
     private static CCSWeaponAPI api;
     private final MolotovManager molotovManager = new MolotovManagerImpl();
+    private final MechanicListener knockBackManager = new MechanicListener();
 
     public static CCSWeaponAPI getApi() {
         return api;
@@ -26,7 +28,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
         api = this;
         new ConfigManager(this).loadConfig();
         getServer().getPluginManager().registerEvents(new WeaponListeners(this), this);
-        getServer().getPluginManager().registerEvents(new MechanicListener(), this);
+        getServer().getPluginManager().registerEvents(knockBackManager, this);
     }
 
     @Override
@@ -61,5 +63,10 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
     @Override
     public MolotovManager getMolotovManager() {
         return molotovManager;
+    }
+
+    @Override
+    public KnockBackManager getKnockBackManager() {
+        return knockBackManager;
     }
 }
