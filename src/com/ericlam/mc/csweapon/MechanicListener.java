@@ -85,6 +85,7 @@ public class MechanicListener implements Listener, KnockBackManager {
 
     @Override
     public void createKnockBack(Entity damager, Entity victim, double value) {
+        if (value == 0.0) return;
         (new KnockBackRunnable(damager, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
     }
 
