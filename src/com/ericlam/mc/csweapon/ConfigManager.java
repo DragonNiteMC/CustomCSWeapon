@@ -11,11 +11,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public class ConfigManager {
+class ConfigManager {
     private FileConfiguration config;
     private File configFile;
     static int flash_radius, molo_duration;
@@ -24,40 +22,40 @@ public class ConfigManager {
     static boolean customSound, noKnockBack, useDamagePercent;
     static double customKnockBack;
     private static List<String> molotovs = new ArrayList<>();
-    private static List<String> scopes = new ArrayList<>();
+    private static Set<String> scopes = new HashSet<>();
     private static List<String> flashbangs = new ArrayList<>();
     private static HashMap<String, ItemStack> scopeSkin;
     private static List<String> flashBypass = new ArrayList<>();
 
 
-    public static List<String> getFlashBypass() {
-        return flashBypass;
-    }
-
-    public static HashMap<String, ItemStack> getScopeSkin() {
-        return scopeSkin;
-    }
-
-    public static List<String> getFlashbangs() {
-        return flashbangs;
-    }
-
-    public static ConfigManager getInstance() {
-        return configManager;
-    }
-
-    public static List<String> getMolotovs() {
-        return molotovs;
-    }
-
-    public ConfigManager(Plugin plugin){
+    ConfigManager(Plugin plugin) {
         configManager = this;
-        configFile = new File(plugin.getDataFolder(),"config.yml");
-        if (!configFile.exists()) plugin.saveResource("config.yml",true);
+        configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) plugin.saveResource("config.yml", true);
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
-    public static List<String> getScopes() {
+    static List<String> getFlashBypass() {
+        return flashBypass;
+    }
+
+    static HashMap<String, ItemStack> getScopeSkin() {
+        return scopeSkin;
+    }
+
+    static List<String> getFlashbangs() {
+        return flashbangs;
+    }
+
+    static ConfigManager getInstance() {
+        return configManager;
+    }
+
+    static List<String> getMolotovs() {
+        return molotovs;
+    }
+
+    static Set<String> getScopes() {
         return scopes;
     }
 
@@ -65,10 +63,9 @@ public class ConfigManager {
 
     }
 
-    public void loadConfig(){
+    void loadConfig() {
         molo_duration = config.getInt("molotov-duration");
         molotovs = config.getStringList("molotov");
-        scopes = config.getStringList("scope");
         flashbangs = config.getStringList("flashbangs");
         flash_radius = config.getInt("flash-radius");
         flashBypass = config.getStringList("flash-bypass-blacklist");
@@ -78,10 +75,14 @@ public class ConfigManager {
         noKnockBack = config.getBoolean("knockback.disable");
         useDamagePercent = config.getBoolean("knockback.custom.damage-percent");
         customKnockBack = config.getDouble("knockback.custom.value");
-        HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         ConfigurationSection section = config.getConfigurationSection("scope-skin");
+        if (section == null) return;
+        scopes = section.getKeys(false);
+        HashMap<String, ItemStack> scopeSkin = new HashMap<>();
         for (String weaponTitle : section.getKeys(false)) {
-            String[] value = section.getString(weaponTitle).split(":");
+            String wea = section.getString(weaponTitle);
+            if (wea == null) continue;
+            String[] value = wea.split(":");
             String material = value[0];
             ItemStack skinStack = new ItemStack(Material.valueOf(material));
             if (value.length > 1) {
@@ -96,7 +97,7 @@ public class ConfigManager {
         ConfigManager.scopeSkin = scopeSkin;
     }
 
-    public void reloadConfig(){
+    void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
         loadConfig();
     }

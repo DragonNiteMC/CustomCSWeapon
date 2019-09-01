@@ -1,11 +1,6 @@
 molotov-duration: 20
 molotov:
   - Molotov
-scope:
-  - AWM
-  - M14
-  - M24
-  - SVD
 scope-skin: #[material]:[damage]
   AWM: IRON_NUGGET
   M14: IRON_NUGGET
