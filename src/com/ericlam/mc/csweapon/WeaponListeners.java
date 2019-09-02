@@ -73,7 +73,7 @@ public class WeaponListeners implements Listener {
         Team ATteam = attacker.getScoreboard().getEntryTeam(attacker.getName());
         if (VTteam == null || ATteam == null) return;
         if (ATteam.getName().equals(VTteam.getName())) {
-            e.setCancelled(true);
+            if (!ATteam.allowFriendlyFire()) e.setCancelled(true);
         }
     }
 
