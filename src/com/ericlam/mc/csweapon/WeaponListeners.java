@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,9 +49,15 @@ public class WeaponListeners implements Listener {
 
     @EventHandler
     public void onGunDamage(WeaponDamageEntityEvent e) {
-        if (!(e.getDamager() instanceof Projectile)) return;
         if (!(e.getVictim() instanceof Player)) return;
+        Player attacker = e.getPlayer();
         Player player = (Player) e.getVictim();
+        this.checkFriendlyFire(e, attacker, player);
+        this.checkHeadShot(e, player);
+    }
+
+    private void checkHeadShot(WeaponDamageEntityEvent e, Player player) {
+        if (!(e.getDamager() instanceof Projectile)) return;
         if (!e.isHeadshot()) return;
         boolean helmet = player.getInventory().getHelmet() != null;
         String sound = helmet ? ConfigManager.helmetSound : ConfigManager.noHelmetSound;
@@ -58,6 +65,15 @@ public class WeaponListeners implements Listener {
             player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 3, 1);
         } else {
             player.getWorld().playSound(player.getLocation(), sound, 3, 1);
+        }
+    }
+
+    private void checkFriendlyFire(WeaponDamageEntityEvent e, Player attacker, Player player) {
+        Team VTteam = player.getScoreboard().getEntryTeam(player.getName());
+        Team ATteam = attacker.getScoreboard().getEntryTeam(attacker.getName());
+        if (VTteam == null || ATteam == null) return;
+        if (ATteam.getName().equals(VTteam.getName())) {
+            e.setCancelled(true);
         }
     }
 
@@ -138,7 +154,7 @@ public class WeaponListeners implements Listener {
         if (!ConfigManager.getScopeSkin().containsKey(weaponTitle)) return;
         PlayerInventory playerInventory = player.getInventory();
         final ItemStack original_item = playerInventory.getItemInOffHand();
-        if (put && original_item != null && original_item.getType() != Material.AIR)
+        if (put && original_item.getType() != Material.AIR)
             originalOffhandItem.put(player, original_item);
         ItemStack stack = ConfigManager.getScopeSkin().get(weaponTitle);
         playerInventory.setItemInOffHand(stack);
