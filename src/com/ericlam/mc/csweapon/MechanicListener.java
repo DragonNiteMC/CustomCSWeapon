@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
@@ -87,6 +88,11 @@ public class MechanicListener implements Listener, KnockBackManager {
     public void createKnockBack(Entity damager, Entity victim, double value) {
         if (value == 0.0) return;
         (new KnockBackRunnable(damager, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        this.customKBDisabled.remove(e.getPlayer());
     }
 
     @Override

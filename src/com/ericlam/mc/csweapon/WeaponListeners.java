@@ -10,6 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -47,7 +48,7 @@ public class WeaponListeners implements Listener {
         csWeapon.getMolotovManager().spawnFires(e.getLocation().getBlock());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onGunDamage(WeaponDamageEntityEvent e) {
         if (!(e.getVictim() instanceof Player)) return;
         Player attacker = e.getPlayer();
@@ -71,9 +72,13 @@ public class WeaponListeners implements Listener {
     private void checkFriendlyFire(WeaponDamageEntityEvent e, Player attacker, Player player) {
         Team VTteam = player.getScoreboard().getEntryTeam(player.getName());
         Team ATteam = attacker.getScoreboard().getEntryTeam(attacker.getName());
-        if (VTteam == null || ATteam == null) return;
+        if (VTteam == null || ATteam == null) {
+            return;
+        }
         if (ATteam.getName().equals(VTteam.getName())) {
-            if (!ATteam.allowFriendlyFire()) e.setCancelled(true);
+            if (!ATteam.allowFriendlyFire()) {
+                e.setCancelled(true);
+            }
         }
     }
 
