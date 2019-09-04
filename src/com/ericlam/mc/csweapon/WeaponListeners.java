@@ -172,8 +172,16 @@ public class WeaponListeners implements Listener {
 
     @EventHandler
     public void arrarcute(WeaponPreShootEvent e) {
+        Player player = e.getPlayer();
+        if (player.isSprinting() || !player.isOnGround()) {
+            String type = csDirector.getString(e.getWeaponTitle() + ".Shooting.Projectile_Type");
+            if (!type.equalsIgnoreCase("grenade") && !type.equalsIgnoreCase("flare")) {
+                e.setBulletSpread(5);
+                return;
+            }
+        }
         if (!ConfigManager.getScopes().contains(e.getWeaponTitle())) return;
-        if (!scoping.containsKey(e.getPlayer())) return;
+        if (!scoping.containsKey(player)) return;
         double spread = csDirector.getDouble(e.getWeaponTitle() + ".Scope.Zoom_Bullet_Spread");
         e.setBulletSpread(spread);
     }
