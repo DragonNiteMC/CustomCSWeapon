@@ -24,8 +24,9 @@ class ConfigManager {
     private static List<String> molotovs = new ArrayList<>();
     private static Set<String> scopes = new HashSet<>();
     private static List<String> flashbangs = new ArrayList<>();
-    private static HashMap<String, ItemStack> scopeSkin;
+    private static HashMap<String, ItemStack> scopeSkin = new HashMap<>();
     private static List<String> flashBypass = new ArrayList<>();
+    private static Map<String, Double> shotguns = new HashMap<>();
 
 
     ConfigManager(Plugin plugin) {
@@ -59,6 +60,10 @@ class ConfigManager {
         return scopes;
     }
 
+    static Map<String, Double> getShotguns() {
+        return shotguns;
+    }
+
     private ConfigManager(){
 
     }
@@ -69,6 +74,21 @@ class ConfigManager {
         flashbangs = config.getStringList("flashbangs");
         flash_radius = config.getInt("flash-radius");
         flashBypass = config.getStringList("flash-bypass-blacklist");
+        Optional.ofNullable(config.getConfigurationSection("shotguns")).ifPresent(sec -> {
+            sec.getValues(false).forEach((k, v) -> {
+                double damage;
+                if (v instanceof Integer) {
+                    damage = (int) v;
+                } else if (v instanceof Double) {
+                    damage = (double) v;
+                } else if (v instanceof Float) {
+                    damage = (float) v;
+                } else {
+                    return;
+                }
+                shotguns.put(k, damage);
+            });
+        });
         helmetSound = config.getString("headshot.helmet-sound");
         noHelmetSound = config.getString("headshot.no-helmet-sound");
         customSound = config.getBoolean("headshot.custom-sound");

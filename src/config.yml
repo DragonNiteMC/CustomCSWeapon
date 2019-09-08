@@ -12,6 +12,9 @@ flash-radius: 30
 flash-bypass-blacklist:
   - GLASS
   - GLASS_PANE
+shotguns:
+  SPAS: 10
+  AA12: 10
 headshot:
   custom-sound: false
   helmet-sound: "ENTITY_ZOMBIE_DEATH"

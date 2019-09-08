@@ -55,6 +55,7 @@ public class WeaponListeners implements Listener {
         Player attacker = e.getPlayer();
         Player player = (Player) e.getVictim();
         this.checkFriendlyFire(e, attacker, player);
+        this.shotGunDamage(e, attacker, player);
         this.checkHeadShot(e, player);
     }
 
@@ -81,6 +82,14 @@ public class WeaponListeners implements Listener {
                 e.setCancelled(true);
             }
         }
+    }
+
+    private void shotGunDamage(WeaponDamageEntityEvent e, Player attacker, Player victim) {
+        if (!ConfigManager.getShotguns().containsKey(e.getWeaponTitle())) return;
+        double distance = attacker.getLocation().distance(victim.getLocation());
+        final double origDamage = e.getDamage();
+        final double finalDamage = origDamage - (distance * ConfigManager.getShotguns().get(e.getWeaponTitle()));
+        e.setDamage(finalDamage <= 5 ? 5 : finalDamage);
     }
 
 
@@ -176,7 +185,9 @@ public class WeaponListeners implements Listener {
         Player player = e.getPlayer();
         if (player.isSprinting() || !player.isOnGround()) {
             String type = csDirector.getString(e.getWeaponTitle() + ".Shooting.Projectile_Type");
-            if (!type.equalsIgnoreCase("grenade") && !type.equalsIgnoreCase("flare")) {
+            boolean notGrenade = !type.equalsIgnoreCase("grenade") && !type.equalsIgnoreCase("flare");
+            boolean notMolotov = !ConfigManager.getMolotovs().contains(e.getWeaponTitle());
+            if (notGrenade && notMolotov) {
                 e.setBulletSpread(5);
                 return;
             }
