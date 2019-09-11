@@ -16,6 +16,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class MolotovManagerImpl implements MolotovManager {
 
     private ConcurrentLinkedDeque<Location> fireBlocks = new ConcurrentLinkedDeque<>();
+    private final CWSConfig cwsConfig;
+
+    public MolotovManagerImpl(CWSConfig cwsConfig) {
+        this.cwsConfig = cwsConfig;
+    }
 
     private List<Location> getRandomSpread(List<Location> circle, int amount){
         List<Location> result = new ArrayList<>();
@@ -57,7 +62,7 @@ public class MolotovManagerImpl implements MolotovManager {
                 if (fireBlock.getType() == Material.FIRE) fire.getBlock().setType(Material.AIR);
                 fireBlocks.remove(fire);
             }
-        }, ConfigManager.molo_duration * 20L);
+        }, cwsConfig.molo_duration * 20L);
     }
 
     @Override

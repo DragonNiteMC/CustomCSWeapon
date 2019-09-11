@@ -27,12 +27,17 @@ import java.util.Set;
 
 public class MechanicListener implements Listener, KnockBackManager {
     private Set<OfflinePlayer> customKBDisabled = new HashSet<>();
+    private final CWSConfig cwsConfig;
+
+    public MechanicListener(CWSConfig cwsConfig) {
+        this.cwsConfig = cwsConfig;
+    }
 
     @EventHandler
     public void onFlashbang(WeaponExplodeEvent e) {
-        if (!ConfigManager.getFlashbangs().contains(e.getWeaponTitle())) return;
+        if (!cwsConfig.flashbangs.contains(e.getWeaponTitle())) return;
         Location flash = e.getLocation();
-        Collection<Player> nearbyPlayers = flash.getNearbyPlayers(ConfigManager.flash_radius);
+        Collection<Player> nearbyPlayers = flash.getNearbyPlayers(cwsConfig.flash_radius);
         playerloop:
         for (Player player : nearbyPlayers) {
             Location loc = player.getEyeLocation();
@@ -41,7 +46,7 @@ public class MechanicListener implements Listener, KnockBackManager {
             BlockIterator iterator = new BlockIterator(player.getWorld(), flash.toVector(), vec, 0, (int) flash.distance(loc));
             while (iterator.hasNext()) {
                 Material current = iterator.next().getType();
-                if (current != Material.AIR && !ConfigManager.getFlashBypass().contains(current.toString()))
+                if (current != Material.AIR && !cwsConfig.flashBypass.contains(current.toString()))
                     continue playerloop;
             }
             if (dot < 0) {
@@ -57,20 +62,20 @@ public class MechanicListener implements Listener, KnockBackManager {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onKnockback(WeaponDamageEntityEvent e) {
         if (e.isCancelled()) return;
-        if (!ConfigManager.noKnockBack) return;
+        if (!cwsConfig.noKnockBack) return;
         Entity damager = e.getDamager();
         Entity damagee = e.getVictim();
         if (!(damagee instanceof Player)) return;
         Player vPlayer = (Player) damagee;
         if (customKBDisabled.contains(vPlayer)) return;
         if (!(damager instanceof Projectile)) return;
-        final double kb = ConfigManager.useDamagePercent ? e.getDamage() * ConfigManager.customKnockBack : ConfigManager.customKnockBack;
+        final double kb = cwsConfig.useDamagePercent ? e.getDamage() * cwsConfig.customKnockBack : cwsConfig.customKnockBack;
         this.createKnockBack(damager, damagee, kb);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if (!ConfigManager.noKnockBack) return;
+        if (!cwsConfig.noKnockBack) return;
         Optional.ofNullable(e.getPlayer().getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).ifPresent(attr -> {
 
             for (AttributeModifier attrMod : attr.getModifiers()) {

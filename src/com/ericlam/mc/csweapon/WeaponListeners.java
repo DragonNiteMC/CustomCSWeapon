@@ -19,8 +19,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
@@ -30,22 +33,39 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class WeaponListeners implements Listener {
-    public static HashSet<UUID> leftScopes = new HashSet<>(); //later change permission
+    static HashSet<UUID> leftScopes = new HashSet<>(); //later change permission
     private final CSUtility csUtility;
     private final CSDirector csDirector;
     private HashMap<Player, String> scoping = new HashMap<>();
     private HashMap<Player, ItemStack> originalOffhandItem = new HashMap<>();
+    private final HashMap<String, ItemStack> skinScope = new HashMap<>();
     private final CustomCSWeapon csWeapon;
+    private final CWSConfig cwsConfig;
 
-    public WeaponListeners(CustomCSWeapon csWeapon) {
+    WeaponListeners(CustomCSWeapon csWeapon, CWSConfig cwsConfig) {
         this.csWeapon = csWeapon;
         csUtility = new CSUtility();
         csDirector = csUtility.getHandle();
+        this.cwsConfig = cwsConfig;
+        cwsConfig.scopeSkin.forEach((k, wea) -> {
+            if (wea == null) return;
+            String[] value = wea.split(":");
+            String material = value[0];
+            ItemStack skinStack = new ItemStack(Material.valueOf(material));
+            if (value.length > 1) {
+                ItemMeta meta = skinStack.getItemMeta();
+                ((Damageable) meta).setDamage(Integer.parseInt(value[1]));
+                meta.setUnbreakable(true);
+                meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+                skinStack.setItemMeta(meta);
+            }
+            skinScope.put(k, skinStack);
+        });
     }
 
     @EventHandler
     public void onMolotovExplode(WeaponExplodeEvent e) {
-        if (!ConfigManager.getMolotovs().contains(e.getWeaponTitle())) return;
+        if (!cwsConfig.molotovs.contains(e.getWeaponTitle())) return;
         csWeapon.getMolotovManager().spawnFires(e.getLocation().getBlock());
     }
 
@@ -63,8 +83,8 @@ public class WeaponListeners implements Listener {
         if (!(e.getDamager() instanceof Projectile)) return;
         if (!e.isHeadshot()) return;
         boolean helmet = player.getInventory().getHelmet() != null;
-        String sound = helmet ? ConfigManager.helmetSound : ConfigManager.noHelmetSound;
-        if (!ConfigManager.customSound) {
+        String sound = helmet ? cwsConfig.helmetSound : cwsConfig.noHelmetSound;
+        if (!cwsConfig.customSound) {
             player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 3, 1);
         } else {
             player.getWorld().playSound(player.getLocation(), sound, 3, 1);
@@ -85,10 +105,10 @@ public class WeaponListeners implements Listener {
     }
 
     private void shotGunDamage(WeaponDamageEntityEvent e, Player attacker, Player victim) {
-        if (!ConfigManager.getShotguns().containsKey(e.getWeaponTitle())) return;
+        if (!cwsConfig.shotguns.containsKey(e.getWeaponTitle())) return;
         double distance = attacker.getLocation().distance(victim.getLocation());
         final double origDamage = e.getDamage();
-        final double finalDamage = origDamage - (distance * ConfigManager.getShotguns().get(e.getWeaponTitle()));
+        final double finalDamage = origDamage - (distance * cwsConfig.shotguns.get(e.getWeaponTitle()));
         e.setDamage(finalDamage <= 5 ? 5 : finalDamage);
     }
 
@@ -102,7 +122,7 @@ public class WeaponListeners implements Listener {
         if (!scoping.containsKey(player)) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
-            if (!ConfigManager.getScopes().contains(weaponTitle)) return;
+            if (!cwsConfig.scopes.contains(weaponTitle)) return;
             scoping.put(player, weaponTitle);
             scope(weaponTitle, player, true);
         } else {
@@ -119,7 +139,7 @@ public class WeaponListeners implements Listener {
         if (e.isSneaking()) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
-            if (!ConfigManager.getScopes().contains(weaponTitle)) return;
+            if (!cwsConfig.scopes.contains(weaponTitle)) return;
             scoping.put(player, weaponTitle);
             scope(weaponTitle, player, true);
         } else {
@@ -137,7 +157,6 @@ public class WeaponListeners implements Listener {
         if (!scoping.containsKey(player)) return;
         String weaponTitle = scoping.get(player);
         if (remove) scoping.remove(player);
-        HashMap<String, ItemStack> skinScope = ConfigManager.getScopeSkin();
         if (player.getInventory().getItemInOffHand().isSimilar(skinScope.get(weaponTitle))) {
             ItemStack stack;
             if (originalOffhandItem.containsKey(player)) stack = originalOffhandItem.get(player);
@@ -152,7 +171,7 @@ public class WeaponListeners implements Listener {
     @EventHandler
     public void onScopeShoot(WeaponShootEvent e) {
         String weaponTitle = e.getWeaponTitle();
-        if (!ConfigManager.getScopes().contains(weaponTitle)) return;
+        if (!cwsConfig.scopes.contains(weaponTitle)) return;
         if (!csDirector.getString(weaponTitle + ".Firearm_Action.Type").equalsIgnoreCase("bolt")) return;
         Player player = e.getPlayer();
         unscope(player, false);
@@ -166,12 +185,12 @@ public class WeaponListeners implements Listener {
         int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
         csWeapon.getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
-        if (!ConfigManager.getScopeSkin().containsKey(weaponTitle)) return;
+        if (!cwsConfig.scopes.contains(weaponTitle)) return;
         PlayerInventory playerInventory = player.getInventory();
         final ItemStack original_item = playerInventory.getItemInOffHand();
         if (put && original_item.getType() != Material.AIR)
             originalOffhandItem.put(player, original_item);
-        ItemStack stack = ConfigManager.getScopeSkin().get(weaponTitle);
+        ItemStack stack = skinScope.get(weaponTitle);
         playerInventory.setItemInOffHand(stack);
     }
 
@@ -186,13 +205,13 @@ public class WeaponListeners implements Listener {
         if (player.isSprinting() || !player.isOnGround()) {
             String type = csDirector.getString(e.getWeaponTitle() + ".Shooting.Projectile_Type");
             boolean notGrenade = !type.equalsIgnoreCase("grenade") && !type.equalsIgnoreCase("flare");
-            boolean notMolotov = !ConfigManager.getMolotovs().contains(e.getWeaponTitle());
+            boolean notMolotov = !cwsConfig.molotovs.contains(e.getWeaponTitle());
             if (notGrenade && notMolotov) {
                 e.setBulletSpread(5);
                 return;
             }
         }
-        if (!ConfigManager.getScopes().contains(e.getWeaponTitle())) return;
+        if (!cwsConfig.scopes.contains(e.getWeaponTitle())) return;
         if (!scoping.containsKey(player)) return;
         double spread = csDirector.getDouble(e.getWeaponTitle() + ".Scope.Zoom_Bullet_Spread");
         e.setBulletSpread(spread);
