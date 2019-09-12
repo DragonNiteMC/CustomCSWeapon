@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Resource(locate = "config.yml")
-public class CWSConfig implements Configuration {
+public class CWSConfig extends Configuration {
 
     @Prop(path = "flash-radius")
     int flash_radius;

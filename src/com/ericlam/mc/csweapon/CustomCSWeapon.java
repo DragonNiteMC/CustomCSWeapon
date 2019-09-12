@@ -29,7 +29,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
     public void onEnable() {
         api = this;
         yamlManager = HyperNiteMC.getAPI().getFactory().getConfigFactory(this).register("config.yml", CWSConfig.class).dump();
-        CWSConfig cwsConfig = yamlManager.getConfigAs("config.yml", CWSConfig.class);
+        CWSConfig cwsConfig = yamlManager.getConfigAs(CWSConfig.class);
         molotovManager = new MolotovManagerImpl(cwsConfig);
         knockBackManager = new MechanicListener(cwsConfig);
         getServer().getPluginManager().registerEvents(new WeaponListeners(this, cwsConfig), this);
