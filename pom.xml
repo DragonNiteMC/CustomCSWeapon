@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>com.ericlam.mc</artifactId>
+    <groupId>CustomCSWeapon</groupId>
+    <version>1.5.10</version>
+
+    <repositories>
+        <repository>
+            <id>xuan</id>
+            <url>http://xuan.nctu.me:8081/repository/Maven/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hypernite.mc</groupId>
+            <artifactId>core-api</artifactId>
+            <version>7.5.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>other</groupId>
+            <artifactId>crackshot</artifactId>
+            <version>0.89.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>other</groupId>
+            <artifactId>crackshotplus</artifactId>
+            <version>1.88</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>CustomCSWeapon</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>

@@ -62,7 +62,7 @@ public class MolotovManagerImpl implements MolotovManager {
                 if (fireBlock.getType() == Material.FIRE) fire.getBlock().setType(Material.AIR);
                 fireBlocks.remove(fire);
             }
-        }, cwsConfig.molo_duration * 20L);
+        }, cwsConfig.molotov_duration * 20L);
     }
 
     @Override

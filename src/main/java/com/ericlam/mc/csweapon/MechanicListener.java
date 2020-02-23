@@ -46,7 +46,7 @@ public class MechanicListener implements Listener, KnockBackManager {
             BlockIterator iterator = new BlockIterator(player.getWorld(), flash.toVector(), vec, 0, (int) flash.distance(loc));
             while (iterator.hasNext()) {
                 Material current = iterator.next().getType();
-                if (current != Material.AIR && !cwsConfig.flashBypass.contains(current.toString()))
+                if (current != Material.AIR && !cwsConfig.flash_bypass_blacklist.contains(current.toString()))
                     continue playerloop;
             }
             if (dot < 0) {
@@ -62,20 +62,23 @@ public class MechanicListener implements Listener, KnockBackManager {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onKnockback(WeaponDamageEntityEvent e) {
         if (e.isCancelled()) return;
-        if (!cwsConfig.noKnockBack) return;
+        if (!cwsConfig.knockback.disable) return;
         Entity damager = e.getDamager();
         Entity damagee = e.getVictim();
         if (!(damagee instanceof Player)) return;
         Player vPlayer = (Player) damagee;
         if (customKBDisabled.contains(vPlayer)) return;
         if (!(damager instanceof Projectile)) return;
-        final double kb = cwsConfig.useDamagePercent ? e.getDamage() * cwsConfig.customKnockBack : cwsConfig.customKnockBack;
+        double kb = cwsConfig.knockback.custom.damage_percent ? e.getDamage() * cwsConfig.knockback.custom.value : cwsConfig.knockback.custom.value;
+        if (((Player) damagee).isSprinting()) {
+            kb *= Math.max(1.0, cwsConfig.knockback.custom.increase_rate);
+        }
         this.createKnockBack(damager, damagee, kb);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if (!cwsConfig.noKnockBack) return;
+        if (!cwsConfig.knockback.disable) return;
         Optional.ofNullable(e.getPlayer().getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).ifPresent(attr -> {
 
             for (AttributeModifier attrMod : attr.getModifiers()) {

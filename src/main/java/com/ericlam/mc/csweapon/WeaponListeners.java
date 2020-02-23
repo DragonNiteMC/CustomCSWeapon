@@ -47,7 +47,7 @@ public class WeaponListeners implements Listener {
         csUtility = new CSUtility();
         csDirector = csUtility.getHandle();
         this.cwsConfig = cwsConfig;
-        cwsConfig.scopeSkin.forEach((k, wea) -> {
+        cwsConfig.scope_skin.forEach((k, wea) -> {
             if (wea == null) return;
             String[] value = wea.split(":");
             String material = value[0];
@@ -65,7 +65,7 @@ public class WeaponListeners implements Listener {
 
     @EventHandler
     public void onMolotovExplode(WeaponExplodeEvent e) {
-        if (!cwsConfig.molotovs.contains(e.getWeaponTitle())) return;
+        if (!cwsConfig.molotov.contains(e.getWeaponTitle())) return;
         csWeapon.getMolotovManager().spawnFires(e.getLocation().getBlock());
     }
 
@@ -83,8 +83,8 @@ public class WeaponListeners implements Listener {
         if (!(e.getDamager() instanceof Projectile)) return;
         if (!e.isHeadshot()) return;
         boolean helmet = player.getInventory().getHelmet() != null;
-        String sound = helmet ? cwsConfig.helmetSound : cwsConfig.noHelmetSound;
-        if (!cwsConfig.customSound) {
+        String sound = helmet ? cwsConfig.headshot.helmet_sound : cwsConfig.headshot.no_helmet_sound;
+        if (!cwsConfig.headshot.custom_sound) {
             player.getWorld().playSound(player.getLocation(), Sound.valueOf(sound), 3, 1);
         } else {
             player.getWorld().playSound(player.getLocation(), sound, 3, 1);
@@ -122,7 +122,7 @@ public class WeaponListeners implements Listener {
         if (!scoping.containsKey(player)) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
-            if (!cwsConfig.scopes.contains(weaponTitle)) return;
+            if (!cwsConfig.scope_skin.containsKey(weaponTitle)) return;
             scoping.put(player, weaponTitle);
             scope(weaponTitle, player, true);
         } else {
@@ -139,7 +139,7 @@ public class WeaponListeners implements Listener {
         if (e.isSneaking()) {
             String weaponTitle = csUtility.getWeaponTitle(item);
             if (weaponTitle == null) return;
-            if (!cwsConfig.scopes.contains(weaponTitle)) return;
+            if (!cwsConfig.scope_skin.containsKey(weaponTitle)) return;
             scoping.put(player, weaponTitle);
             scope(weaponTitle, player, true);
         } else {
@@ -170,8 +170,19 @@ public class WeaponListeners implements Listener {
 
     @EventHandler
     public void onScopeShoot(WeaponShootEvent e) {
+        /*
+        Projectile entity = (Projectile) e.getProjectile();
+        Arrow arrow = entity.getWorld().spawnArrow(entity.getLocation(), e.getPlayer().getEyeLocation().getDirection(), 10.0f, 0);
+        entity.remove();
+        arrow.setGravity(false);
+        arrow.setBounce(false);
+        arrow.setTicksLived(100);
+        arrow.setColor(Color.RED);
+
+         */
+
         String weaponTitle = e.getWeaponTitle();
-        if (!cwsConfig.scopes.contains(weaponTitle)) return;
+        if (!cwsConfig.scope_skin.containsKey(weaponTitle)) return;
         if (!csDirector.getString(weaponTitle + ".Firearm_Action.Type").equalsIgnoreCase("bolt")) return;
         Player player = e.getPlayer();
         unscope(player, false);
@@ -185,7 +196,7 @@ public class WeaponListeners implements Listener {
         int zoomAmount = csDirector.getInt(weaponTitle + ".Scope.Zoom_Amount");
         csWeapon.getServer().getPluginManager().callEvent(new WeaponScopeEvent(player, weaponTitle, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, -zoomAmount));
-        if (!cwsConfig.scopes.contains(weaponTitle)) return;
+        if (!cwsConfig.scope_skin.containsKey(weaponTitle)) return;
         PlayerInventory playerInventory = player.getInventory();
         final ItemStack original_item = playerInventory.getItemInOffHand();
         if (put && original_item.getType() != Material.AIR)
@@ -205,13 +216,13 @@ public class WeaponListeners implements Listener {
         if (player.isSprinting() || !player.isOnGround()) {
             String type = csDirector.getString(e.getWeaponTitle() + ".Shooting.Projectile_Type");
             boolean notGrenade = !type.equalsIgnoreCase("grenade") && !type.equalsIgnoreCase("flare");
-            boolean notMolotov = !cwsConfig.molotovs.contains(e.getWeaponTitle());
+            boolean notMolotov = !cwsConfig.molotov.contains(e.getWeaponTitle());
             if (notGrenade && notMolotov) {
                 e.setBulletSpread(5);
                 return;
             }
         }
-        if (!cwsConfig.scopes.contains(e.getWeaponTitle())) return;
+        if (!cwsConfig.scope_skin.containsKey(e.getWeaponTitle())) return;
         if (!scoping.containsKey(player)) return;
         double spread = csDirector.getDouble(e.getWeaponTitle() + ".Scope.Zoom_Bullet_Spread");
         e.setBulletSpread(spread);

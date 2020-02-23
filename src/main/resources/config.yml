@@ -1,0 +1,27 @@
+molotov_duration: 20
+molotov:
+  _ Molotov
+scope_skin: #[material]:[damage]
+  AWM: IRON_NUGGET
+  M14: IRON_NUGGET
+  M24: IRON_NUGGET
+  SVD: IRON_NUGGET
+flashbangs:
+  _ Flashbang
+flash_radius: 30
+flash_bypass_blacklist:
+  _ GLASS
+  _ GLASS_PANE
+shotguns:
+  SPAS: 10
+  AA12: 10
+headshot:
+  custom_sound: false
+  helmet_sound: "ENTITY_ZOMBIE_DEATH"
+  no_helmet_sound: "ENTITY_IRON_GOLEM_ATTACK"
+knockback:
+  disable: true
+  custom:
+    damage_percent: true
+    value: 0.00888
+    increase_rate: 1.5144
