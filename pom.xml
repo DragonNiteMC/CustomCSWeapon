@@ -3,7 +3,7 @@
 
     <artifactId>com.ericlam.mc</artifactId>
     <groupId>CustomCSWeapon</groupId>
-    <version>1.5.10</version>
+    <version>1.5.12</version>
 
     <repositories>
         <repository>
