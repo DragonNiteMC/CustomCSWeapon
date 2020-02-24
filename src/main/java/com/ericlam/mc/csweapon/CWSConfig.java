@@ -9,32 +9,32 @@ import java.util.Map;
 @Resource(locate = "config.yml")
 public class CWSConfig extends Configuration {
 
-    int molotov_duration;
+    public int molotov_duration;
 
-    List<String> molotov;
+    public List<String> molotov;
 
-    Map<String, String> scope_skin;
+    public Map<String, String> scope_skin;
 
-    List<String> flashbangs;
+    public List<String> flashbangs;
 
-    int flash_radius;
+    public int flash_radius;
 
-    List<String> flash_bypass_blacklist;
+    public List<String> flash_bypass_blacklist;
 
-    Map<String, Double> shotguns;
+    public Map<String, Double> shotguns;
 
-    HeadShot headshot;
+    public HeadShot headshot;
 
-    KnockBack knockback;
+    public KnockBack knockback;
 
 
-    static class HeadShot {
+    public static class HeadShot {
         boolean custom_sound;
         String helmet_sound;
         String no_helmet_sound;
     }
 
-    static class KnockBack {
+    public static class KnockBack {
         boolean disable;
         Custom custom;
 
