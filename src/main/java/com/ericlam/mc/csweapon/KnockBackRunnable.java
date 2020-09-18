@@ -4,9 +4,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class KnockBackRunnable extends BukkitRunnable {
-    private org.bukkit.entity.Entity Player;
-    private Entity Entity;
-    private double kb;
+    private final Entity Player;
+    private final Entity Entity;
+    private final double kb;
 
     KnockBackRunnable(Entity player, Entity ent, double kb2) {
         this.Player = player;

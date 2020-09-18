@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MolotovManagerImpl implements MolotovManager {
 
-    private ConcurrentLinkedDeque<Location> fireBlocks = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<Location> fireBlocks = new ConcurrentLinkedDeque<>();
     private final CWSConfig cwsConfig;
 
     public MolotovManagerImpl(CWSConfig cwsConfig) {

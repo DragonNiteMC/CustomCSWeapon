@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class MechanicListener implements Listener, KnockBackManager {
-    private Set<OfflinePlayer> customKBDisabled = new HashSet<>();
+    private final Set<OfflinePlayer> customKBDisabled = new HashSet<>();
     private final CWSConfig cwsConfig;
 
     public MechanicListener(CWSConfig cwsConfig) {
