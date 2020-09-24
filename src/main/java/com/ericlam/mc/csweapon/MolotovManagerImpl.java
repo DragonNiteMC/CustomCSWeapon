@@ -49,7 +49,7 @@ public class MolotovManagerImpl implements MolotovManager {
             under.setY(loc.getY()-1);
             if (under.getBlock().getType() == Material.AIR || loc.getBlock().getType() != Material.AIR) continue;
             loc.getBlock().setType(Material.FIRE);
-            fires.add(loc);
+            fires.offer(loc);
         }
         if (fires.size() == 0 ){
             return;
