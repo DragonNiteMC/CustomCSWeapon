@@ -44,7 +44,6 @@
     </dependencies>
 
     <build>
-        <finalName>CustomCSWeapon</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
