@@ -7,8 +7,8 @@
 
     <repositories>
         <repository>
-            <id>chu77</id>
-            <url>https://nexus.chu77.xyz/repository/developer/</url>
+            <id>dragonnite</id>
+            <url>https://nexus.pulogo.xyz/repository/developer/</url>
         </repository>
         <repository>
             <id>papermc</id>
@@ -18,27 +18,27 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.3-R0.1-SNAPSHOT</version>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.hypernite.mc</groupId>
+            <groupId>com.dragonnite.mc</groupId>
             <artifactId>core-api</artifactId>
-            <version>7.6.4</version>
+            <version>7.6.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>crackshot</artifactId>
-            <version>0.89.9</version>
+            <version>0.98.11</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>crackshotplus</artifactId>
-            <version>1.95</version>
+            <version>1.105</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

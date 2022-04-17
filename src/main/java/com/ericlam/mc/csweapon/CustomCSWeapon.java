@@ -3,8 +3,8 @@ package com.ericlam.mc.csweapon;
 import com.ericlam.mc.csweapon.api.CCSWeaponAPI;
 import com.ericlam.mc.csweapon.api.KnockBackManager;
 import com.ericlam.mc.csweapon.api.MolotovManager;
-import com.hypernite.mc.hnmc.core.main.HyperNiteMC;
-import com.hypernite.mc.hnmc.core.managers.YamlManager;
+import com.dragonnite.mc.dnmc.core.main.DragonNiteMC;
+import com.dragonnite.mc.dnmc.core.managers.YamlManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +28,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
     @Override
     public void onEnable() {
         api = this;
-        yamlManager = HyperNiteMC.getAPI().getFactory().getConfigFactory(this).register("config.yml", CWSConfig.class).dump();
+        yamlManager = DragonNiteMC.getAPI().getFactory().getConfigFactory(this).register("config.yml", CWSConfig.class).dump();
         CWSConfig cwsConfig = yamlManager.getConfigAs(CWSConfig.class);
         molotovManager = new MolotovManagerImpl(cwsConfig);
         knockBackManager = new MechanicListener(cwsConfig);
@@ -45,7 +45,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
     public boolean onCommand(@Nonnull CommandSender sender, Command command, @Nonnull String label, @Nonnull String[] args) {
         if (command.getName().equals("csw-reload")) {
             if (!sender.hasPermission("hypernite.admin")) {
-                sender.sendMessage(HyperNiteMC.getAPI().getCoreConfig().getPrefix() + HyperNiteMC.getAPI().getCoreConfig().getNoPerm());
+                sender.sendMessage(DragonNiteMC.getAPI().getCoreConfig().getPrefix() + DragonNiteMC.getAPI().getCoreConfig().getNoPerm());
                 return false;
             }
             yamlManager.reloadConfigs();
