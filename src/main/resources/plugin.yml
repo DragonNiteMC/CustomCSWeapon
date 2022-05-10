@@ -3,7 +3,7 @@ main: com.ericlam.mc.csweapon.CustomCSWeapon
 version: ${project.version}
 api-version: "1.15"
 author: Hydranapse_
-depend: [CrackShotPlus, CrackShot, DragonNiteMC-Core]
+depend: [CrackShotPlus, CrackShot, DragoniteMC-Core]
 commands:
   csw-reload:
     description: reload command

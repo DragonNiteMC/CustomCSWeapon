@@ -1,8 +1,8 @@
 package com.ericlam.mc.csweapon;
 
 import com.ericlam.mc.csweapon.api.MolotovManager;
-import com.dragonnite.mc.dnmc.core.utils.Tools;
-import com.dragonnite.mc.dnmc.core.utils.Utils;
+import com.dragonite.mc.dnmc.core.utils.Tools;
+import com.dragonite.mc.dnmc.core.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
