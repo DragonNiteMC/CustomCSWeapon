@@ -44,7 +44,7 @@ public class CustomCSWeapon extends JavaPlugin implements Listener, CCSWeaponAPI
     @Override
     public boolean onCommand(@Nonnull CommandSender sender, Command command, @Nonnull String label, @Nonnull String[] args) {
         if (command.getName().equals("csw-reload")) {
-            if (!sender.hasPermission("hypernite.admin")) {
+            if (!sender.hasPermission("dragonite.admin")) {
                 sender.sendMessage(DragoniteMC.getAPI().getCoreConfig().getPrefix() + DragoniteMC.getAPI().getCoreConfig().getNoPerm());
                 return false;
             }
