@@ -2,21 +2,22 @@ package com.ericlam.mc.csweapon;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class KnockBackRunnable extends BukkitRunnable {
-    private final Entity Player;
+    private final Vector vector;
     private final Entity Entity;
     private final double kb;
 
-    KnockBackRunnable(Entity player, Entity ent, double kb2) {
-        this.Player = player;
+    KnockBackRunnable(Vector bullet, Entity ent, double kb2) {
+        this.vector = bullet;
         this.Entity = ent;
         this.kb = kb2;
     }
 
     public void run() {
-        if (this.Entity != null && this.Player != null) {
-            this.Entity.setVelocity(this.Player.getVelocity().multiply(this.kb).setY(0));
+        if (this.Entity != null && this.vector != null) {
+            this.Entity.setVelocity(this.vector.multiply(this.kb).setY(0));
         }
     }
 }

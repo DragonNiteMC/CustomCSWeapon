@@ -2,14 +2,14 @@ package com.ericlam.mc.csweapon;
 
 
 import com.ericlam.mc.csweapon.api.KnockBackManager;
-import com.shampaggon.crackshot.events.WeaponDamageEntityEvent;
-import com.shampaggon.crackshot.events.WeaponExplodeEvent;
+import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectileExplodeEvent;
+import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponDamageEntityEvent;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,7 +34,7 @@ public class MechanicListener implements Listener, KnockBackManager {
     }
 
     @EventHandler
-    public void onFlashbang(WeaponExplodeEvent e) {
+    public void onFlashbang(ProjectileExplodeEvent e) {
         if (!cwsConfig.flashbangs.contains(e.getWeaponTitle())) return;
         Location flash = e.getLocation();
         Collection<Player> nearbyPlayers = flash.getNearbyPlayers(cwsConfig.flash_radius);
@@ -63,17 +63,14 @@ public class MechanicListener implements Listener, KnockBackManager {
     public void onKnockback(WeaponDamageEntityEvent e) {
         if (e.isCancelled()) return;
         if (!cwsConfig.knockback.disable) return;
-        Entity damager = e.getDamager();
-        Entity damagee = e.getVictim();
-        if (!(damagee instanceof Player)) return;
-        Player vPlayer = (Player) damagee;
-        if (customKBDisabled.contains(vPlayer)) return;
-        if (!(damager instanceof Projectile)) return;
-        double kb = cwsConfig.knockback.custom.damage_percent ? e.getDamage() * cwsConfig.knockback.custom.value : cwsConfig.knockback.custom.value;
-        if (((Player) damagee).isSprinting()) {
+        if (!(e.getShooter() instanceof Player player)) return;
+        if (!(e.getVictim() instanceof Player victim)) return;
+        if (customKBDisabled.contains(victim)) return;
+        double kb = cwsConfig.knockback.custom.damage_percent ? e.getFinalDamage() * cwsConfig.knockback.custom.value : cwsConfig.knockback.custom.value;
+        if (victim.isSprinting()) {
             kb *= Math.max(1.0, cwsConfig.knockback.custom.increase_rate);
         }
-        this.createKnockBack(damager, damagee, kb);
+        this.createKnockBack(player.getVelocity().add(player.getFacing().getDirection()), victim, kb);
     }
 
     @EventHandler
@@ -93,9 +90,9 @@ public class MechanicListener implements Listener, KnockBackManager {
     }
 
     @Override
-    public void createKnockBack(Entity damager, Entity victim, double value) {
+    public void createKnockBack(Vector vector, Entity victim, double value) {
         if (value == 0.0) return;
-        (new KnockBackRunnable(damager, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
+        (new KnockBackRunnable(vector, victim, value)).runTaskLater(CustomCSWeapon.getPlugin(CustomCSWeapon.class), 1L);
     }
 
     @EventHandler

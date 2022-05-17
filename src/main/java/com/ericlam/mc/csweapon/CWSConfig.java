@@ -13,8 +13,6 @@ public class CWSConfig extends Configuration {
 
     public List<String> molotov;
 
-    public Map<String, String> scope_skin;
-
     public List<String> flashbangs;
 
     public int flash_radius;

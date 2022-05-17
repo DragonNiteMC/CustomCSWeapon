@@ -1,9 +1,9 @@
 name: CustomCSWeapon
 main: com.ericlam.mc.csweapon.CustomCSWeapon
 version: ${project.version}
-api-version: "1.15"
+api-version: "1.18"
 author: Hydranapse_
-depend: [CrackShotPlus, CrackShot, DragoniteMC-Core]
+depend: [WeaponMechanics, DragoniteMC-Core]
 commands:
   csw-reload:
     description: reload command
